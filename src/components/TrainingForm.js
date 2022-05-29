@@ -1,14 +1,10 @@
 
-import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { XIcon } from "@heroicons/react/solid";
+import TagsAutoComplete from './TagsAutoComplete';
+
+// TODO: think about how provider comes into play (maybe type ahead as well?)
 
 const TrainingForm = () => {
-
-    const [tags, setTags] = useState(['python', 'javascript', 'react', 'node']);
-    const removeTag = (tag) => {
-        setTags(tags.filter(t => t !== tag));
-    }
 
     return (
         <div className="mx-20 w-8/12">
@@ -26,31 +22,34 @@ const TrainingForm = () => {
                             placeholder="Provider..."
                         />
                     </label>
+
+                    {/* the two radio buttons, one other the under */}
                     <div className='ml-10'>
                         <div className='flex ml-4 mt-4'>
-                            <div class="flex items-center mr-4">
+                            <div className="flex items-center mr-4">
                                 <input id="internal-radio" type="radio" value="interal" name="internal-radio" className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white" />
-                                <label for="internal-radio" className="ml-2 text-sm text-slate-800">Internal</label>
+                                <label htmlFor="internal-radio" className="ml-2 text-sm text-slate-800">Internal</label>
                             </div>
-                            <div class="flex items-center mr-4">
+                            <div className="flex items-center mr-4">
                                 <input id="external-radio" type="radio" value="external" name="internal-radio" className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white" />
-                                <label for="external-radio" className="ml-2 text-sm text-slate-800">External</label>
+                                <label htmlFor="external-radio" className="ml-2 text-sm text-slate-800">External</label>
                             </div>
                         </div>
 
                         <div className="flex ml-4 mt-4">
-                            <div class="flex items-center mr-4">
+                            <div className="flex items-center mr-4">
                                 <input id="online-radio" type="radio" value="online" name="online-radio" className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white" />
-                                <label for="online-radio" className="ml-2 text-sm text-slate-800">Online</label>
+                                <label htmlFor="online-radio" className="ml-2 text-sm text-slate-800">Online</label>
                             </div>
-                            <div class="flex items-center mr-4">
+                            <div className="flex items-center mr-4">
                                 <input id="inperson-radio" type="radio" value="in-person" name="online-radio" className="ml-[.45em] w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white" />
-                                <label for="inperson-radio" className="ml-2 text-sm text-slate-800">In-person</label>
+                                <label htmlFor="inperson-radio" className="ml-2 text-sm text-slate-800">In-person</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Name of the training */}
                 <label className="block mt-4 w-3/5">
                     <span className="text-sm text-slate-800">
                         Name
@@ -64,6 +63,7 @@ const TrainingForm = () => {
                     />
                 </label>
 
+                {/* Description of the training */}
                 <div className='mt-4'>
                     <span className="text-sm text-slate-800">
                         Description
@@ -77,6 +77,8 @@ const TrainingForm = () => {
                         placeholder="Description of Conference/Training..." 
                     />
                 </div>
+
+                {/* upload of image to represent training */}
                 <label className="block mt-4 w-3/5">
                     <input 
                         type="file" 
@@ -90,25 +92,8 @@ const TrainingForm = () => {
                     <span className="text-[10px] text-slate-500 px-5">(Background for Conference/Training)</span>
                 </label>
 
-                <div className="border-hidden mt-4">
-                    <span className="text-sm text-slate-900">Tags:</span>
-                    <div className="flex flex-wrap text-[8px] uppercase items-center font-bold px-1 pt-1.5 space-y-1 overflow-hidden">
-                        {tags.map((tag, i) => (
-                            <div className="flex items-center px-1 py-[0.1em] bg-cyan-100 text-cyan-800 font-medium mr-2 rounded overflow-hidden">
-                                <span 
-                                    key={i} 
-                                    className="uppercase"
-                                >
-                                    {tag}
-                                </span>
-                                <XIcon 
-                                    className="h-2 w-2 ml-1 text-slate-500 cursor-pointer" 
-                                    onClick={() => removeTag(tag)}
-                                />
-                            </div>
-                        ))}
-                </div>
-        </div>
+                <TagsAutoComplete />
+
             </form>
             <div className="float-right mr-40 mt-20">
                 <div className="relative group">
