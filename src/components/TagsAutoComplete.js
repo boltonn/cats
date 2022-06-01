@@ -1,11 +1,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { XIcon } from "@heroicons/react/solid";
+import catsBackend from "../apis/catsBackend";
+
 
 const TagsAutoComplete = () => {
 
-    const [tags, setTags] = useState(['python', 'javascript', 'react', 'node']);
+    const [tags, setTags] = useState([]);
     const [tagTerm, setTagTerm] = useState('');
+    const [debouncedTerm, setDebouncedTerm] = useState(tagTerm);
+    const [tagSuggestions, setTagSuggestions] = useState([]);
+
     const [showDropdown, setShowDropdown] = useState(false);
     const [cursor, setCursor] = useState(-1);
     const ref = useRef();
@@ -18,7 +23,7 @@ const TagsAutoComplete = () => {
     }
 
     function getDropdownClassName(index, length, cursor) {
-        let className = 'px-4 py-2 text-slate-800 text-sm hover:bg-cyan-100';
+        let className = 'px-4 py-1 text-slate-800 text-sm hover:bg-cyan-100';
         if (index === 0) {
             className += ' rounded-t-lg';
         } else if (index === length - 1) {
@@ -91,7 +96,34 @@ const TagsAutoComplete = () => {
         };
     }, []);
 
-    const tagSuggestions = ['python', 'pandas', 'purple', 'peanuts', 'poop'];
+    useEffect(() => {
+        //queue's up debouncedTerm to be changed in 1s
+        // ...but if term changes too fast the timer gets reset and requeued
+        const timerId = setTimeout(() => {
+            setDebouncedTerm(tagTerm);
+        }, 100);
+
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [tagTerm]);
+
+    useEffect(() => {
+        const search = async () => {
+            const { data } = await catsBackend.get('allTags', {
+                params: {
+                    tag_prefix: debouncedTerm,
+                    size: 7
+                },
+            });
+
+            setTagSuggestions(data);
+        };
+        search();
+
+    }, [debouncedTerm]);
+
+    // const tagSuggestions = ['python', 'pandas', 'purple', 'peanuts', 'poop'];
 
     return (
         <div className="border-hidden mt-4">
@@ -131,10 +163,13 @@ const TagsAutoComplete = () => {
                         {tagSuggestions.map((tag, i) => (
                             <li
                                 className={getDropdownClassName(i, tagSuggestions.length, cursor)}
-                                key={tag}
-                                onClick={() => selectTag(tag)}
+                                key={tag.key}
+                                onClick={() => selectTag(tag.key)}
                             >
-                                {tag}
+                                <div className="flex align-center">
+                                    <span className='text-[10px]'>{tag.key}</span>
+                                    <span className='pl-1 text-[9px] text-slate-400'>({tag.doc_count})</span>
+                                </div>
                             </li>
                         ))}
                     </ul>

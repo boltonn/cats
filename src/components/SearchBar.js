@@ -28,7 +28,8 @@ const SearchBar = (props) => {
             <div className='input-group relative flex flex-wrap items-stretch max-h-10 w-full'>
                 <input 
                     className="form-control relative flex-auto min-w-0 block w-full px-3 py-2 border-2 transition ease-in-out
-                        text-sm bg-clip-padding border-slate-300 hover:border-cyan-200 active:border-cyan-300 outline-none rounded-full shadow-sm"
+                        text-sm bg-clip-padding border-slate-300 hover:border-cyan-200 active:border-cyan-300 outline-none 
+                        rounded-full shadow-sm dark:bg-slate-300 dark:border-5 focus:border-cyan-200"
                     type="text" 
                     placeholder="Search..."
                     aria-describedby="search-button"

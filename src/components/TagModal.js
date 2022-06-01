@@ -1,41 +1,155 @@
 
-const TagModal = () => {
-    <div>
-        <button type="button"
-            class="inline-block px-6 py-2.5 bg-cyan-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-            data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            Launch static backdrop modal
-        </button>
-        <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-            id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog relative w-auto pointer-events-none">
-                <div
-                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                    <div
-                        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-                        <h5 class="text-xl font-medium leading-normal text-gray-800" id="exampleModalLabel">
-                            Modal title
-                        </h5>
-                        <button type="button"
-                            class="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
+import { useState, useEffect } from 'react';
+import { XIcon } from "@heroicons/react/solid";
+import catsBackend from "../apis/catsBackend";
+
+const TagModal = ({ open, onClose, addFilter }) => {
+    const [tags, setTags] = useState([]);
+    const [tagTerm, setTagTerm] = useState('');
+    const [debouncedTerm, setDebouncedTerm] = useState(tagTerm);
+    const [tagSuggestions, setTagSuggestions] = useState([]);
+    
+    const removeTag = (tag) => {
+        setTags(tags.filter(t => t !== tag));
+    }
+    const addTag = (tag) => {
+        setTags(tags.concat(tag));
+    }
+
+    const handleCheckBoxChange = (e) => {
+        if (e.target.checked) {
+            if (!tags.includes(e.target.value)) {
+                addTag(e.target.value);
+            }
+        } else {
+            removeTag(e.target.value);
+        }
+    }
+
+    const handleSubmit = () => {
+        tags.forEach(tag => addFilter(tag));
+        onClose();
+    }
+
+    useEffect(() => {
+        //queue's up debouncedTerm to be changed in 1s
+        // ...but if term changes too fast the timer gets reset and requeued
+        const timerId = setTimeout(() => {
+            setDebouncedTerm(tagTerm);
+        }, 300);
+
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [tagTerm]);
+
+    useEffect(() => {
+        const search = async () => {
+            const { data } = await catsBackend.get('allTags', {
+                params: {
+                    tag_prefix: debouncedTerm,
+                    size: 36
+                },
+            });
+
+            setTagSuggestions(data);
+        };
+        search();
+
+    }, [debouncedTerm]);
+
+    // reset suggestions when modal closes
+    useEffect(() => {
+        setTagTerm('');
+        setDebouncedTerm('');
+        setTags([])
+    }, [open]);
+
+    if (!open) return null;
+    return (
+        <div
+            onClick={onClose}
+            className="flex fixed bg-black/60 inset-0 z-50 justify-center items-center"
+        >
+            <div 
+                className="w-3/5 h-3/5 bg-white rounded-lg"
+                onClick={(e) => e.stopPropagation()}    
+            >
+                <div className='flex justify-end mt-4 mr-4'>
+                    <XIcon
+                        className="h-5 w-5 ml-1 text-slate-500 cursor-pointer hover:text-cyan-500"
+                        onClick={onClose}
+                    />
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                    <input
+                        className="text-sm text-slate-600 shadow rounded py-3 pl-2 form-input mt-2 block h-5
+                        ext-slate-900 bg-slate-50 border border-slate-300 placeholder-slate-300
+                        focus:ring-cyan-200 focus:border-cyan-200 focus:ring-1 focus:outline-none"
+                        type="text"
+                        placeholder="Search Tag"
+                        value={tagTerm}
+                        onChange={e => setTagTerm(e.target.value)}
+                        // react hook form doesnt allow normal submit, so we use onKeyPress
+                        onSubmit={() => setDebouncedTerm(tagTerm)}
+                    />
+
+                    {/* showing filters you've selected */}
+                    <div className="mt-2 flex flex-wrap text-[8px] items-center font-bold px-1 pt-1.5 space-y-1 overflow-hidden">
+                        {tags.map((tag, i) => (
+                            <span 
+                                key={i} 
+                                className="px-1 bg-cyan-100 text-cyan-800 font-medium mr-2 rounded hover:cursor-pointer" 
+                            >
+                                {tag}
+                            </span>
+                        ))}
                     </div>
-                    <div class="modal-body relative p-4">
-                        ...
-                    </div>
-                    <div
-                        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
-                        <button type="button"
-                            class="inline-block px-6 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
-                            data-bs-dismiss="modal">Close</button>
-                        <button type="button"
-                            class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out ml-1">Understood</button>
-                    </div>
+
+                    {/* checkboxes */}
+                    <ul className="grid grid-cols-3 mt-6 w-5/6">
+                        {tagSuggestions.map((tag, i) => (
+                            <li className='flex items-center my-1' key={i}>
+                                <input
+                                    className="form-check-input w-3 h-3 border-slate-300 rounded text-cyan-300
+                                    dark:accent-cyan-600 focus:ring-transparent transition duration-200 cursor-pointer"
+                                    type="checkbox"
+                                    id={i}
+                                    name={tag.key}
+                                    value={tag.key}
+                                    onChange={handleCheckBoxChange}
+                                />
+                                <label
+                                    className="form-check-label inline-block text-slate-800 text-xs pl-1 text-overflow-shrink"
+                                    htmlFor="checkbox-tag"
+                                >
+                                    <div className="align-center">
+                                        <span className='text-[10px]'>{tag.key}</span>
+                                        <span className='pl-1 text-[9px] text-slate-400'>({tag.doc_count})</span>
+                                    </div>
+                                </label>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="pr-12 float-right">
+                <div className="relative group mt-20">
+                    <div className="absolute -inset-0.5 bg-cyan-500 rounded-md blur opacity-25 
+                    focus:ring-4 focus:outline-none focus:ring-cyan-300
+                    group-hover:opacity-75 transition duration-1000 group-hover:duration-200"
+                    />
+                    <button 
+                        className="flex relative leading-none px-2 py-2 rounded-md text-white bg-cyan-400"
+                        onClick={handleSubmit}  
+                    >
+                        <span className="text-xs">Add Filters</span>
+                    </button>
                 </div>
             </div>
+            </div>
         </div>
-    </div>
-}
+    );
+};
+
 
 export default TagModal;

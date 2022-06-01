@@ -2,7 +2,7 @@
 const TagFilters = ({ title, tags, onChange }) => {
     return (
         <div className="border-hidden">
-            <span className="text-xs font-bold pl-2 text-slate-700">{title}</span>
+            <span className="text-xs font-bold pl-2 text-slate-700 dark:text-white">{title}</span>
             <div className="flex flex-wrap text-[8px] items-center font-bold px-1 pt-1.5 space-y-1 overflow-hidden">
                 {tags.map((tag, i) => (
                     <span 

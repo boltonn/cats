@@ -1,7 +1,8 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-    content: ["./src/**/*.{html,js}"],
+    content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
+    darkMode: "class",
     theme: {
         colors: {
             transparent: 'transparent',
@@ -10,6 +11,7 @@ module.exports = {
             white: colors.white,
             slate: colors.slate,
             cyan: colors.cyan,
+            gray: colors.gray,
             pink: colors.pink,
             yellow: colors.yellow,
         },
@@ -21,6 +23,7 @@ module.exports = {
         backgroundColor: ['responsive', 'hover', 'focus', 'active'],
         borderColor: ['responsive', 'hover', 'focus', 'active'],
         textColor: ['responsive', 'hover', 'focus', 'active'],
+        display: ['responsive', 'hover', 'focus', 'active', 'group-hover', 'group-focus'],
     },
     plugins: [
         require('@tailwindcss/line-clamp'),

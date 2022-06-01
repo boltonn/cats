@@ -27,13 +27,13 @@ const CheckFilter = ({ trueFilter, falseFilter, filter, onChange }) => {
                         id="checkbox-true"
                         type="checkbox"
                         value=""
-                        className="form-check-input w-3 h-3 bg-white border-slate-300 rounded text-cyan-300
-                        dark:accent-cyan-600 focus:ring-white transition duration-200 cursor-pointer"
+                        className="form-check-input w-3 h-3 border-slate-300 rounded text-cyan-300
+                        dark:accent-cyan-600 focus:ring-transparent transition duration-200 cursor-pointer"
                         checked={filter===true}
                         onChange={() => posChange(filter)}
                     />
                     <label
-                        className="form-check-label inline-block text-slate-800 text-xs pl-1"
+                        className="form-check-label inline-block text-slate-800 dark:text-white text-xs pl-1"
                         htmlFor="checkbox-true"
                     >
                         {trueFilter}
@@ -44,13 +44,13 @@ const CheckFilter = ({ trueFilter, falseFilter, filter, onChange }) => {
                         id="checkbox-false"
                         type="checkbox"
                         value=""
-                        className="form-check-input w-3 h-3 bg-white border-slate-300 rounded text-cyan-300 
-                        dark:accent-cyan-600 focus:ring-white transition duration-200 cursor-pointer"
+                        className="form-check-input w-3 h-3 border-slate-300 rounded text-cyan-300 
+                        dark:accent-cyan-600 focus:ring-transparent transition duration-200 cursor-pointer"
                         checked={filter===false}
                         onChange={() => negChange(filter)}
                     />
                     <label
-                        className="form-check-label inline-block text-slate-800 text-xs pl-1"
+                        className="form-check-label inline-block text-slate-800 dark:text-white text-xs pl-1"
                         htmlFor="checkbox-false"
                     >
                         {falseFilter}

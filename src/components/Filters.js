@@ -1,13 +1,18 @@
 
+import { useState } from 'react';
+import { connect } from "react-redux";
 import TagFilters from "./TagFilters";
 import Separator from "./Separator";
 import CheckFilter from "./CheckFilter";
-import { connect } from "react-redux";
+import TagModal from './TagModal';
 import { setIsOnline, setIsInternal, addTagFilter, clearTagFilters, setProvider } from "../actions";
 
 // TODO: filter by provider; overflow size
 
 const Filters = (props) => {
+
+    const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+
     const clearFilters = () => {
         props.clearTagFilters();
         props.setIsOnline(null);
@@ -20,13 +25,13 @@ const Filters = (props) => {
             {/* user can see what filters they've selected */}
             <div className="pl-2 mb-4">
                 {((props.tagFilters.length === 0) && (props.isInternal === null) && (props.isOnline == null) && (props.provider === null)) 
-                    ? <p className="font-bold pl-2 text-slate-700 mb-4">Filters</p>
+                    ? <p className="font-bold pl-2 text-slate-700 dark:text-white mb-4">Filters</p>
                     : (
-                        <div className="text-[10px]">
-                            <span className="font-bold text-slate-900">
+                        <div className="text-[9px]">
+                            <span className="font-bold text-slate-900 dark:text-cyan-100">
                                 {props.tagFilters.length + (props.isInternal!==null)*1 + (props.isOnline!==null)*1 + (props.provider!==null)*1} Filter{(props.tagFilters.length + (props.isInternal!==null)*1 + (props.isOnline!==null)*1 + (props.provider!==null)*1) > 1 ? "s" : ""}
                             </span>
-                            <div className="flex flex-wrap items-center text-slate-400">
+                            <div className="flex flex-wrap items-center text-slate-400 dark:text-white">
                                 {(props.isInternal === null)
                                     ? <div />
                                     : <span>{props.isInternal ? "Internal" : "External"}</span>
@@ -89,7 +94,16 @@ const Filters = (props) => {
                 onChange={props.setIsOnline}    
             />
             <Separator />
-            <TagFilters title="Tags" tags={props.trainings.tag_aggs} onChange={props.addTagFilter} />
+            <div>
+                <TagFilters title="Tags" tags={props.trainings.tag_aggs} onChange={props.addTagFilter} />
+                <span 
+                    className="flex justify-end mt-2 mr-6 text-[9px] text-cyan-400 hover:underline hover:cursor-pointer"
+                    onClick={() => setIsTagModalOpen(true)}
+                >
+                    Search all
+                </span>
+                <TagModal open={isTagModalOpen} onClose={() => setIsTagModalOpen(false)} addFilter={props.addTagFilter} />
+            </div>
             <Separator />
             <TagFilters title="Providers" tags={props.trainings.provider_aggs} onChange={props.setProvider}/>
         </div>
