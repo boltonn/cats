@@ -4,9 +4,9 @@ import { XIcon } from "@heroicons/react/solid";
 import catsBackend from "../apis/catsBackend";
 
 
-const TagsAutoComplete = () => {
+const TagsAutoComplete = ({ tags, setTags }) => {
 
-    const [tags, setTags] = useState([]);
+    // const [tags, setTags] = useState([]);
     const [tagTerm, setTagTerm] = useState('');
     const [debouncedTerm, setDebouncedTerm] = useState(tagTerm);
     const [tagSuggestions, setTagSuggestions] = useState([]);
@@ -127,7 +127,7 @@ const TagsAutoComplete = () => {
 
     return (
         <div className="border-hidden mt-4">
-            <span className="text-sm text-slate-900">Tags:</span>
+            <span className="text-sm text-slate-900 dark:text-cyan-400">Tags:</span>
             <div className="flex flex-wrap text-[8px] uppercase items-center font-bold px-1 pt-1.5 space-y-1 overflow-hidden">
                 {tags.map((tag, i) => (
                     <div
@@ -159,7 +159,7 @@ const TagsAutoComplete = () => {
                 />
                 {/* dropdown for autocomplete */}
                 {showDropdown && (
-                    <ul className='mt-1 absolute shadow-md hover:shadow-lg w-full rounded-lg'>
+                    <ul className='mt-1 absolute shadow-md hover:shadow-lg w-full rounded-lg bg-white'>
                         {tagSuggestions.map((tag, i) => (
                             <li
                                 className={getDropdownClassName(i, tagSuggestions.length, cursor)}

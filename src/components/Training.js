@@ -8,7 +8,11 @@ const Training = ({ training }) => {
             <div className="flex py-7 px-2 border-b cursor-pointer hover:opacity-80 hover:shadow-lg 
             transition duration-200 ease-out">
                 <div className="relative h-24 w-40 md:h-40 md:w-80 flex items-center">
-                    <img className="h-24 w-40 md:h-40 md:w-80" src={training.image} alt="training image" />
+                    <img 
+                        className="h-24 w-40 md:h-40 md:w-80" 
+                        src={`${process.env.REACT_APP_BACKEND_URL}/trainingImage/${training.id}`}
+                        alt="Training Image" 
+                    />
                 </div>
                 <div className="flex flex-col w-full h-24 md:h-full pl-2 overflow-hidden">
                     <h4 className="text-xl dark:text-white">{training.title}</h4>

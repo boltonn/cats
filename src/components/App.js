@@ -10,7 +10,7 @@ import TrainingForm from "./TrainingForm";
 
 const App = () => {
     return (
-        <div>
+        <div className='bg-white dark:bg-slate-800 h-screen'>
             <BrowserRouter>
                 <Header />
                 <Route exact path="/" component={Trainings} />

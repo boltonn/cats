@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { XIcon } from "@heroicons/react/solid";
 import catsBackend from "../apis/catsBackend";
 
+// TODO: might want to tie clicking on tag to uncheck a box and remove tag from state
+
 const TagModal = ({ open, onClose, addFilter }) => {
     const [tags, setTags] = useState([]);
     const [tagTerm, setTagTerm] = useState('');

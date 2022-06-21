@@ -22,7 +22,7 @@ const Trainings = (props) => {
 
     if (props.trainings) {
         return (
-            <div className="grid grid-cols-5 bg-white dark:bg-slate-800">
+            <div className="grid grid-cols-5">
                 <section className='relative col-span-1 hidden md:inline-flex'>
                     <Filters />
                 </section>

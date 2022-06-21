@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { UserCircleIcon, PencilIcon, SunIcon, MoonIcon } from '@heroicons/react/solid';
 import logo from '../assets/cat.png';
 import darkLogo from '../assets/cat_highlight.png';
@@ -8,8 +9,9 @@ import SearchBar from './SearchBar';
 
 // TODO: decide if we want the debouncer in search
 
-const Header = () => {
+const Header = (props) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [hasImage, setHasImage] = useState(true);
 
     useEffect(() => {
         // on init read localstorage "dark" value & set dark mode ... or not :)
@@ -62,8 +64,17 @@ const Header = () => {
 
                 <div className="relative group px-4 py-2.5">
                     <button className="text-slate-700 dark:text-white rounded-lg text-sm text-center inline-flex items-center">
-                        <UserCircleIcon className="h-8 bg-transparent text-slate-700 dark:text-white hover:text-cyan-200 cursor-pointer" />
-                        <span className="pl-1 text-xs">Nicholas C. Bolton</span>
+                        {hasImage 
+                            ? (
+                                <img
+                                    className="w-7 h-7 rounded-full text-xs cursor-pointer"
+                                    src={`${process.env.REACT_APP_BACKEND_URL}/userImage/${props.user.username}`}
+                                    alt={`Avatar`}
+                                    onError={() => setHasImage(false)}
+                                />)
+                            : <UserCircleIcon className="h-8 bg-transparent text-slate-700 dark:text-white hover:text-cyan-200 cursor-pointer" />
+                        }                        
+                        <span className="pl-1 text-xs">{props.user.displayName}</span>
                     </button>
                     <div className="absolute z-10 hidden bg-white dark:bg-slate-900 group-hover:block w-3/4">
                         <div 
@@ -87,4 +98,12 @@ const Header = () => {
     );
 }
 
-export default Header;
+const mapStateToProps = (state) => {
+    return (
+        {
+            user: state.user
+        }
+    );
+};
+
+export default connect(mapStateToProps)(Header);

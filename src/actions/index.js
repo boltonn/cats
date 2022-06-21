@@ -1,5 +1,4 @@
 
-import axios from 'axios';
 import catsBackend from "../apis/catsBackend";
 
 
@@ -69,10 +68,6 @@ export const postReview = (trainingId, username, rating, review) => async dispat
     };
     console.log(payload);
     const id = await catsBackend.post(`/trainings/${trainingId}/review`, null, payload);
-    // axios.post(`http://localhost:8080/review`, temp);
-
-    // dispatch({ type: "SET_IS_LOADING", payload: false });
-
 };
 
 export const addTagFilter = value => async dispatch => {
@@ -99,3 +94,10 @@ export const setSearchTerm = value => async dispatch => {
         payload: value
     });
 };
+
+export const setUser = user => async dispatch => {
+    dispatch({
+        type: 'LOGIN',
+        payload: user
+    })
+}

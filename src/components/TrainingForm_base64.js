@@ -1,51 +1,38 @@
 
-import qs from 'qs';
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import TagsAutoComplete from './TagsAutoComplete';
 import catsBackend from '../apis/catsBackend';
-import SubmitModal from './SubmitModal';
+import qs from 'qs';
 
-
-// TODO: think about how provider comes into play (maybe type ahead as well?)
+// DEPRECATED: this way seemed to have a file size limit (could resize the image but was a pain)
 
 const TrainingForm = () => {
+    const { control, register, handleSubmit, watch, formState: { errors } } = useForm();
 
-    const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-    const { register, handleSubmit, formState: { errors } } = useForm();
     const [tags, setTags] = useState([]);
-    const [trainingId, setTrainingId] = useState('');
     const [image, setImage] = useState(null);
-    const history = useHistory();
 
-    useEffect(() => {
-        if(trainingId !== '') {
-            console.log(`Loaded training to: ${trainingId}`);
-            console.log(image);
-            if(image !== null) {
-                onImageSubmit();
-            }
-            history.push('/');
-        }
-    }, [trainingId]);
-
-    const uploadImage = (e) => {
-        setImage(e.target.files[0]);
+    const uploadImage = async e => {
+        const file = e.target.files[0];
+        const base64 = await convertBase64(file);
+        const base64String = base64.replace("data:", "").replace(/^.+,/, "");
+        const encodedbase64String = encodeURIComponent(base64String);
+        setImage(encodedbase64String);
     }
 
-    const onImageSubmit = () => {
-        let form_data = new FormData();
-        form_data.append('image', image, trainingId+'.jpg');
-        catsBackend.post('trainingImage', form_data, {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
-        })
-            .then(res => {
-                console.log(res.data);
-            })
-            .catch(err => console.log(err))
+    const convertBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            let fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = () =>{
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+        });
     }
 
     const onSubmit = data => {
@@ -53,11 +40,12 @@ const TrainingForm = () => {
         data.is_internal = data.is_internal === 'internal' ? true : false;
         data.is_online = data.is_online === 'online' ? true : false;
         console.log(data);
-        catsBackend.post(`/training/?${qs.stringify(data)}`, {})
-            .then((resp) => {
-                setTrainingId(resp.data);
-            }
-        )
+        if (image === null) {
+            catsBackend.post(`/training/?${qs.stringify(data)}`, {})
+        } else {
+            // only way i could get the image to not be cut off (still a max size limit)
+            catsBackend.post(`/training/?${qs.stringify(data)}&image=${image}`, {})
+        };
     };
 
     return (
@@ -67,7 +55,7 @@ const TrainingForm = () => {
             >
                 <div className="flex">
                     <label className="block w-1/4">
-                        <span className={`text-sm ${errors.provider ? "text-pink-500" : "text-slate-800 dark:text-cyan-400"}`} >
+                        <span className={`text-sm ${errors.provider ? "text-pink-500" : "text-slate-800"}`} >
                             Provider
                         </span>
                         <input
@@ -96,10 +84,10 @@ const TrainingForm = () => {
                                     type="radio"
                                     value="interal"
                                     name="internal-radio"
-                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-transparent"
+                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white"
                                     {...register('is_internal', { required: true })}
                                 />
-                                <label htmlFor="internal-radio" className="ml-2 text-sm text-slate-800 dark:text-white">Internal</label>
+                                <label htmlFor="internal-radio" className="ml-2 text-sm text-slate-800">Internal</label>
                             </div>
                             <div className="flex items-center mr-4">
                                 <input
@@ -107,10 +95,10 @@ const TrainingForm = () => {
                                     type="radio"
                                     value="external"
                                     name="internal-radio"
-                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-transparent"
+                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white"
                                     {...register('is_internal', { required: true })}
                                 />
-                                <label htmlFor="external-radio" className="ml-2 text-sm text-slate-800 dark:text-white">External</label>
+                                <label htmlFor="external-radio" className="ml-2 text-sm text-slate-800">External</label>
                             </div>
                         </div>
                         {errors.is_internal && errors.is_internal.type === "required" && (
@@ -124,10 +112,10 @@ const TrainingForm = () => {
                                     type="radio"
                                     value="online"
                                     name="online-radio"
-                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-transparent"
+                                    className="w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white"
                                     {...register('is_online', { required: true })}
                                 />
-                                <label htmlFor="online-radio" className="ml-2 text-sm text-slate-800 dark:text-white">Online</label>
+                                <label htmlFor="online-radio" className="ml-2 text-sm text-slate-800">Online</label>
                             </div>
                             <div className="flex items-center mr-4">
                                 <input
@@ -135,10 +123,10 @@ const TrainingForm = () => {
                                     type="radio"
                                     value="in-person"
                                     name="online-radio"
-                                    className="ml-[.45em] w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-transparent"
+                                    className="ml-[.45em] w-4 h-4 text-cyan-300 bg-slate-100 border-slate-300 focus:ring-white"
                                     {...register('is_online', { required: true })}
                                 />
-                                <label htmlFor="inperson-radio" className="ml-2 text-sm text-slate-800 dark:text-white">In-person</label>
+                                <label htmlFor="inperson-radio" className="ml-2 text-sm text-slate-800">In-person</label>
                             </div>
                         </div>
                         {errors.is_online && errors.is_online.type === "required" && (
@@ -149,7 +137,7 @@ const TrainingForm = () => {
 
                 {/* Name of the training */}
                 <label className="block mt-4 w-3/5">
-                    <span className={`text-sm ${errors.title ? "text-pink-500" : "text-slate-800 dark:text-cyan-400"}`} >
+                    <span className={`text-sm ${errors.title ? "text-pink-500" : "text-slate-800"}`} >
                         Name
                     </span>
                     <input
@@ -169,7 +157,7 @@ const TrainingForm = () => {
 
                 {/* Description of the training */}
                 <div className='mt-4'>
-                    <span className={`text-sm ${errors.description ? "text-pink-500" : "text-slate-800 dark:text-cyan-400"}`}>
+                    <span className={`text-sm ${errors.description ? "text-pink-500" : "text-slate-800"}`}>
                         Description
                     </span>
                     <textarea
@@ -193,23 +181,23 @@ const TrainingForm = () => {
                 <label className="block mt-4 w-3/5">
                     <input
                         type="file"
-                        className="block w-full text-sm text-slate-500 dark:text-cyan-100 file:mr-4 file:py-2 file:px-4 
+                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 
                         file:rounded-full file:border-0 file:text-sm file:font-semibold rounded-full
                         file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100 border border-slate-300
                         focus:ring-cyan-300 focus:border-cyan-300 focus:ring-1 focus:outline-none"
                         accept="image/*"
                         name='Choose image'
                         onChange={uploadImage}
-                        // {...registerImage('image')}
+                        // {...register('image')}
                     />
-                    <span className="text-[10px] text-slate-500 dark:text-white px-5">(Background for Conference/Training)</span>
+                    <span className="text-[10px] text-slate-500 px-5">(Background for Conference/Training)</span>
                 </label>
 
                 <TagsAutoComplete tags={tags} setTags={setTags} />
             </form>
             <div
                 className="float-right mr-40 mt-20"
-                onClick={() => setIsSubmitModalOpen(true)}
+                onClick={handleSubmit(onSubmit)}
             >
                 <div className="relative group">
                     <div className="absolute -inset-0.5 bg-cyan-400 rounded-md blur opacity-25 
@@ -224,12 +212,6 @@ const TrainingForm = () => {
                     </button>
                 </div>
             </div>
-            <SubmitModal 
-                open={isSubmitModalOpen} 
-                onClose={() => setIsSubmitModalOpen(false)} 
-                onConfirm={handleSubmit(onSubmit)} 
-            />
-
         </div>
     );
 }

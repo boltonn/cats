@@ -7,9 +7,11 @@ import isInternalReducer from "./isInternalReducer";
 import tagFiltersReducer from "./tagFiltersReducer";
 import providerReducer from "./providerReducer";
 import searchTermReducer from "./searchTermReducer";
+import userReducer from "./userReducer";
 
 
 export default combineReducers({
+    user: userReducer,
     trainings: trainingsReducer,
     isLoading: LoadingReducer,
     reviews: reviewsReducer,

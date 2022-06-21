@@ -5,6 +5,7 @@ import { useParams, useLocation, Link } from "react-router-dom";
 import { StarIcon, TagIcon } from "@heroicons/react/solid";
 import { fetchReviews } from "../actions";
 import ProgressBar from "./ProgressBar";
+import Review from "./Review";
 
 // TODO: 
 //     fetch from DB if you go straight to the page and aren't linked?
@@ -19,7 +20,7 @@ const Reviews = (props) => {
     useEffect(() => {
         // make sure props not undefined
         if (props) {
-            console.log("fetching reviews");
+            // console.log("fetching reviews");
             props.fetchReviews(id);
         }
     }, []);
@@ -37,8 +38,9 @@ const Reviews = (props) => {
             <div className="flex items-center justify-center bg-cyan-50 border-y border-black py-10 lg:py-0 w-full">
                 <img
                     className="hidden md:inline-flex h-32 lg:h-full object-contain" 
-                    src={training.image} 
-                    alt="training image" 
+                    // src={training.image} 
+                    src={`${process.env.REACT_APP_BACKEND_URL}/trainingImage/${id}`}
+                    alt="Training Image" 
                 />
                 <div className="px-5">
                     <h1 className="text-4xl max-w-xl font-serif">
@@ -66,8 +68,8 @@ const Reviews = (props) => {
                     data-bs-toggle="modal" 
                     data-bs-target="#staticBackdrop"
                 >
-                    <TagIcon className="h-4 text-transparent stroke-slate-800 stroke-[1.5px]" />
-                    <span className="ml-1 text-xs text-slate-800">Tag</span>
+                    <TagIcon className="h-4 text-transparent stroke-slate-800 dark:stroke-white stroke-[1.5px]" />
+                    <span className="ml-1 text-xs text-slate-800 dark:text-white">Tag</span>
                 </button>
                 {/* modal for taggging */}
 
@@ -88,12 +90,12 @@ const Reviews = (props) => {
                 </div>
             </div>
             
-            <div className="mx-4 mt-8">
+            <div className="mx-4 mt-8 pb-5">
                 <div className="flex items-center justify-center mb-1">
-                    <span className="star h-5 w-5 text-cyan-300">&#9733;</span>
-                    <p className="ml-2 text-sm font-medium text-slate-900">{training.avg_rating} out of 5</p>
+                    <span className="star text-cyan-300">&#9733;</span>
+                    <p className="ml-1 text-sm font-medium text-slate-900 dark:text-white">{training.avg_rating} out of 5</p>
                 </div>
-                <p className="flex justify-center text-sm font-medium text-slate-500 pl-1">{training.num_reviews} User Review{training.num_reviews === 1 ? "" : "s"}</p>
+                <p className="flex justify-center text-sm font-medium text-slate-500 dark:text-cyan-300 pl-1">{training.num_reviews} User Review{training.num_reviews === 1 ? "" : "s"}</p>
                 {(props.isLoading) ? (
                     <span>Loading...</span>
                 ) : (
@@ -104,6 +106,22 @@ const Reviews = (props) => {
                             number={5-index} />
                     )))
                 }
+            </div>
+
+            <div className="grid place-items-center mt-10 mr-10">
+                <div className="flex flex-start flex-col">
+                    {props.reviews.data.map(review => (
+                        <Review 
+                            key={review._id} 
+                            username={review.username} 
+                            reviewDate={review.review_date}
+                            review={review.review}
+                            rating={review.rating}
+                            likes={review.likes}
+                            replies={review.replies}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );

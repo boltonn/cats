@@ -1,0 +1,11 @@
+{
+    "short_name": "CaTS",
+    "name": "Conference and Training System",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "type": "image/x-icon",
+            "sizes": "64x64"
+        }
+    ]
+}
